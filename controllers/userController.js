@@ -1,11 +1,10 @@
+//userController.js
 const express = require('express');
-const router = express.Router();
 const bcrypt = require('bcrypt');
 require('dotenv').config();
 const jwt = require('jsonwebtoken');
 const nodemailer = require('nodemailer');
 const crypto = require('crypto');
-const User = require('../models/User');
 const { readFileSync } = require('fs');
 const { join } = require('path');
 const User = require('../models/userModel');
@@ -13,6 +12,15 @@ const User = require('../models/userModel');
 const generateVerificationToken = () => {
     return Math.random().toString(14).substring(2, 15) + Math.random().toString(14).substring(2, 15);
   };
+
+  exports.check=async(req,res)=>{
+    try {
+        const msg='Your Server Is Running'
+        res.status(200).json({message:msg})
+    } catch (error) {
+        res.status(500).json({message:'Server Down'});
+    }
+  }
 
   exports.signup=async(req,res)=>{
     const { firstName, lastName, email, password, profilePictureUrl } = req.body;
@@ -35,10 +43,8 @@ const generateVerificationToken = () => {
         profilePictureUrl, 
       });
   
-      // Save the user to the database
       await newUser.save();
   
-      // Send verification email
       const transporter = nodemailer.createTransport({
         service: 'outlook',
         auth: {
@@ -47,7 +53,7 @@ const generateVerificationToken = () => {
         },
       });
   
-      const verificationLink = `http://localhost:4050/verify/${verificationToken}`;
+      const verificationLink = `http://localhost:4051/verify/${verificationToken}`;
   
       const mailOptions = {
         from: process.env.E_MAIL,
@@ -84,10 +90,10 @@ const generateVerificationToken = () => {
         user.verificationToken = undefined;
         await user.save();
     
-        return { success: true, message: 'Email verification successful. You can now log in.' };
+        res.status(200).json({message: 'Email verification successful. You can now log in.' });
       } catch (error) {
         console.error('Error verifying email:', error.message);
-        return { success: false, message: 'Error verifying email. Please try again.' };
+        res.status(500).json({message: 'Error verifying email. Please try again.' });
       }
   }
 
@@ -95,31 +101,26 @@ const generateVerificationToken = () => {
     const { email, password } = req.body;
   
     try {
-      // Check if the user exists by email or username
       const user = await User.findOne({email});
   
       if (!user) {
         return res.status(401).json({ message: 'Email not Registered! Please Signup..' });
       }
   
-      // Check if the email is verified
       if (!user.isEmailVerified) {
         return res.status(401).json({
           message: 'Email not verified. Please check your email for verification instructions.',
         });
       }
   
-      // Compare passwords
       const isPasswordMatch = await bcrypt.compare(password, user.password);
   
       if (!isPasswordMatch) {
         return res.status(401).json({ message: 'Invalid Password! Please check and Try Again.' });
       }
   
-      // Generate a JWT
-      const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
+      const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, { expiresIn: '8h' });
   
-      // Send additional user information in the response
       res.json({
         userId: user._id,
         profilePictureUrl: user.profilePictureUrl,
@@ -165,7 +166,7 @@ exports.forgotPasswordLink=async(req,res)=>{
         },
       });
   
-      const resetLink = `http://localhost:4050/forgot-password-verify/${resetToken}`;
+      const resetLink = `http://localhost:4051/forgot-password-verify/${resetToken}`;
   
       const mailOptions = {
         from: process.env.E_MAIL,
@@ -213,25 +214,22 @@ exports.resetPassword=async(req,res)=>{
   const { newPassword } = req.body;
 
   try {
-    // Find the user with the provided reset token
+    
     const user = await User.findOne({
       resetPasswordToken: resetToken,
-      resetPasswordExpires: { $gt: Date.now() }, // Check if the token is still valid
+      resetPasswordExpires: { $gt: Date.now() },
     });
 
     if (!user) {
       return res.status(400).json({ message: 'Invalid or expired token' });
     }
 
-    // Update the user's password and reset token fields
     user.password = await bcrypt.hash(newPassword, 10);
     user.resetPasswordToken = undefined;
     user.resetPasswordExpires = undefined;
 
-    // Save the updated user document
     await user.save();
 
-    // Send a professional-looking email
     const transporter = nodemailer.createTransport({
       service: 'outlook',
       auth: {
@@ -240,12 +238,10 @@ exports.resetPassword=async(req,res)=>{
       },
     });
 
-    
     const emailTemplatePath = join(__dirname, 'email-template.html');
     const emailTemplate = readFileSync(emailTemplatePath, 'utf-8');
 
-    
-    const formattedEmail = emailTemplate.replace('{{username}}', user.firstName).replace('{{newPassword}}', newPassword);
+    const formattedEmail = emailTemplate.replace('{{firstName}}', user.firstName).replace('{{lastName}}',user.lastName).replace('{{newPassword}}', newPassword);
 
     const mailOptions = {
       from: process.env.E_MAIL,
@@ -266,4 +262,43 @@ exports.resetPassword=async(req,res)=>{
     console.error('Error resetting password:', error.message);
     res.status(500).json({ message: 'Server Error' });
   }
+}
+
+
+exports.getUser=async(req,res)=>{
+    const userId = req.user.userId;
+    try {
+        const user=await User.findById(userId);
+        if(!user){
+            return res.status(401).send('Your Not Authoraized to Edit!');
+        }
+        res.status(200).json({firstName:user.firstName,lastName:user.lastName,email:user.email,profilePictureUrl:user.profilePictureUrl});
+    } catch (error) {
+        res.status(500).send('Server Error: ',error);
+    }
+}
+
+
+exports.editUser=async(req,res)=>{
+    const userId = req.user.userId;
+    const {firstName,lastName, profilePictureUrl}=req.body;
+    try {
+        const user= await User.findById(userId);
+        if(!user){
+            return res.status(401).send('Your Not Authoraized to Edit!');
+        }
+        if(firstName){
+            user.firstName=firstName;
+        }
+        if(lastName){
+            user.lastName=lastName;
+        }
+        if(profilePictureUrl){
+            user.profilePictureUrl=profilePictureUrl;
+        }
+        await user.save();
+        res.status(200).json({message:'User Details updated!',firstName:user.firstName,lastName:user.lastName,email:user.email,profilePictureUrl:user.profilePictureUrl});
+    } catch (error) {
+        res.status(500).send('Server Problem',error);
+    }
 }
