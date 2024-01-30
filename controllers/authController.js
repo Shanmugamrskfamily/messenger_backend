@@ -7,7 +7,7 @@ import { createError } from "../utils/error.js"
 import { msgBody } from '../utils/mailGenerator/actionMsg.js';
 import { sendEmail } from '../utils/mail.js';
 
-export const register = async (req, res, next) => {
+export const signup = async (req, res, next) => {
     try {
         if (!req.body.firstname || !req.body.lastname || !req.body.email || !req.body.password)
             return next(createError(401, "Please fill the all requried fields."));
@@ -54,27 +54,7 @@ export const login = async (req, res, next) => {
     }
 }
 
-export const profileDetails = async (req, res, next) => {
-    try {
-        const userProfile = await User.findById(req.user.id,{ _id:0,token:0,password:0,isVerified:0,createdAt:0,updatedAt:0});
-        res.status(200).json({ data: userProfile })
-    } catch (err) {
-        next(err);
-    }
-}
 
-export const updateProfile = async (req, res, next) => {
-    try {
-        const updateProfile = await User.findByIdAndUpdate(
-            req.user.id,
-            { $set: req.body },
-            { new: true });
-        const { _id,password, tokens, createdAt, ...otherDetails } = updateProfile._doc;
-        res.status(200).json({ data: {...otherDetails}})
-    } catch (err) {
-        next(err);
-    }
-}
 
 export const logout = async (req, res, next) => {
     try {
@@ -84,31 +64,13 @@ export const logout = async (req, res, next) => {
     }
 }
 
-export const changePassword = async (req, res, next) => {
-    try {
-        if (req.body.newPassword.length < 6 || req.body.newPassword.length > 12)
-            return next(createError(401, "Password must be 6 to 12 characters."));
-        else {
-            const user = await User.findById(req.user.id);
-            const isPasswordCorrect = await bcrypt.compare(req.body.oldPassword, user.password);
-            if (!isPasswordCorrect) return next(createError(400, "Wrong password!"))
-            else {
-                user.password = req.body.newPassword;
-                await user.save();
-                res.status(200).send("Password change successful.");
-            }
-        }
-    } catch (err) {
-        next(err);
-    }
-}
 
 export const forgotPassword = async (req, res, next) => {
     try {
         const user = await User.findOne({ email: req.body.email });
-        if (!user)
+        if (!user) {
             return next(createError(404, "User does not exist."));
-        else {
+        } else {
             let token = await Token.findOne({ userId: user._id });
             if (token) {
                 await token.deleteOne();
@@ -117,18 +79,18 @@ export const forgotPassword = async (req, res, next) => {
             let resetToken = crypto.randomBytes(32).toString("hex") + user._id;
 
             const hashedToken = crypto
-                		.createHash("sha256")
-                		.update(resetToken)
-                		.digest("hex");
+                .createHash("sha256")
+                .update(resetToken)
+                .digest("hex");
 
             await new Token({
                 userId: user._id,
                 token: hashedToken,
                 createdAt: Date.now(),
-                expiresAt: Date.now() + 10 * (60 * 1000), // 10 minutes
+                expiresAt: Date.now() + 10 * (60 * 1000),
             }).save();
 
-            const resetUrl = `http://localhost:4051/resetpassword/${resetToken}`;
+            const resetUrl = `http://localhost:4051/api/auth/reset-password/${resetToken}`;
 
             let mailBody = {
                 name: user.username,
@@ -145,7 +107,7 @@ export const forgotPassword = async (req, res, next) => {
             const send_to = user.email;
 
             await sendEmail(subject, message, send_to);
-            res.status(200).send("A password reset mail sent on your email.");
+            res.status(200).send("A password reset email has been sent to your email address.");
         }
     } catch (err) {
         next(err);
@@ -154,22 +116,22 @@ export const forgotPassword = async (req, res, next) => {
 
 export const resetPassword = async (req, res, next) => {
     try {
-        if (req.body.password.length < 6 || req.body.password.length > 12)
-            return next(createError(401, "Password must be 6 to 12 characters."));
-        else {
-            const hashedToken = crypto
-                .createHash("sha256")
-                .update(req.params.resetToken)
-                .digest("hex");
+        if (req.body.password.length < 6 || req.body.password.length > 12) {
+            return next(createError(401, "Password must be between 6 to 12 characters."));
+        } else {
+            const hashedToken = crypto.createHash("sha256").update(req.params.resetToken).digest("hex");
 
             const userToken = await Token.findOne({
-                token : hashedToken,
-                expiresAt : { $gt: Date.now() },
+                token: hashedToken,
+                expiresAt: { $gt: Date.now() },
             });
-            if (!userToken)
+            if (!userToken) {
                 return next(createError(404, "Invalid or Expired Token."));
-            else {
+            } else {
                 const user = await User.findOne({ _id: userToken.userId });
+                if (!user) {
+                    return next(createError(404, "User not found."));
+                }
                 user.password = req.body.password;
                 await user.save();
                 res.status(200).send("Password reset successfully.");

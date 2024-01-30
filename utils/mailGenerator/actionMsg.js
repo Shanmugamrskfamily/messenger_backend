@@ -4,9 +4,8 @@ export const msgBody = (msg) =>{
     var mailGenerator = new Mailgen({
         theme: 'default',
         product: {
-            // Appears in header & footer of e-mails
-            name: 'Electro Mart',
-            link: 'https://mailgen.js/'
+            name: 'Messenger Application',
+            link: 'https://app.netlify.messengerapp/'
         }
     });
 

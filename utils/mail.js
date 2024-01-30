@@ -3,7 +3,7 @@ import nodemailer from 'nodemailer'
 export const sendEmail = (subject, message, send_to) =>{
 
     let config = {
-        service : 'gmail',
+        service : 'outlook',
         auth : {
             user : process.env.E_MAIL,
             pass : process.env.E_PASS
