@@ -22,8 +22,8 @@ export const sendEmail = (subject, message, send_to) =>{
     transporter.sendMail(massage, function (err, info) {
         if (err) {
           console.log(err);
-        } else {
-          console.log(info);
-        }
+         } //else {
+        //   console.log(info);
+        // }
       });
 };

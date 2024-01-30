@@ -1,6 +1,4 @@
 import mongoose from 'mongoose'
-
-
 mongoose.set('strictQuery', false);
 
 export const connected = async () =>{
