@@ -1,0 +1,3 @@
+
+About
+A Full Stack Chat App Project. Using Socket.io, React, Redux, MongoDB, and Express with socket.io for realtime messaging. In this app one on one chat as well as group chatting functionality. Here I am using advanced authentication with JWT. And also use Redux-Toolkit for state mangement and Nodemailer to send emails.
