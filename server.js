@@ -1,7 +1,9 @@
 import app from "./app.js";
 import { Server } from "socket.io";
 import { connected } from "./config/db.js";
-const PORT = process.env.PORT || 1200;
+
+const PORT = process.env.PORT || 5000;
+
 const host = app.listen(PORT, () => {
   connected();
   console.log(`Server is running at port ${PORT}`);
@@ -10,7 +12,7 @@ const host = app.listen(PORT, () => {
 const io = new Server(host, {
   pingTimeout: 60000,
   cors: {
-    origin: "http://localhost:3001",
+    origin: `http://localhost:${PORT}`,
   },
 });
 

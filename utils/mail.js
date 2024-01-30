@@ -5,15 +5,15 @@ export const sendEmail = (subject, message, send_to) =>{
     let config = {
         service : 'gmail',
         auth : {
-            user : process.env.EMAIL,
-            pass : process.env.PASSWORD
+            user : process.env.E_MAIL,
+            pass : process.env.E_PASS
         }
     }
 
     const transporter = nodemailer.createTransport(config)
 
     let massage = {
-        from : process.env.EMAIL,
+        from : process.env.E_MAIL,
         to : send_to,
         subject : subject,
         html : message

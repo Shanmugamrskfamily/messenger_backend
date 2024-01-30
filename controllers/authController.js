@@ -128,7 +128,7 @@ export const forgotPassword = async (req, res, next) => {
                 expiresAt: Date.now() + 10 * (60 * 1000), // 10 minutes
             }).save();
 
-            const resetUrl = `${process.env.FRONTEND_URL}/resetpassword/${resetToken}`;
+            const resetUrl = `http://localhost:4051/resetpassword/${resetToken}`;
 
             let mailBody = {
                 name: user.username,

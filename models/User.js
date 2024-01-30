@@ -32,7 +32,7 @@ const UserSchema = new mongoose.Schema({
         return next();
     }
     const salt = bcrypt.genSaltSync(10);
-    this.password = await bcrypt.hashSync(this.password, salt);
+    this.password = bcrypt.hashSync(this.password, salt);
     next();
   })
 
