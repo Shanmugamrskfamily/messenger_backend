@@ -22,7 +22,7 @@ console.log("mongo connected");
 // const io = new Server(expressServer);
 
 const corsOptions = {
-  origin: ["https://rsk-messenger-web-application.netlify.app", "https://messenger-backend-nr0d.onrender.com"],
+  origin: ["https://rsk-messenger-web-application.netlify.app", "https://messenger-backend-nr0d.onrender.com","http://localhost:3000"],
   methods: ["GET", "POST"],
 };
 
