@@ -3,9 +3,7 @@ export async function sendMail(mailerData) {
   // console.log("mailer Data", mailerData);
   // create reusable transporter object using the default SMTP transport
   let transporter = nodemailer.createTransport({
-    host: "smtp.gmail.com",
     service: "outlook",
-    secure: false,
     auth: {
       user: process.env.EMAIL,
       pass: process.env.PASS,
