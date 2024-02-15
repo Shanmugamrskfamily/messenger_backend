@@ -31,7 +31,7 @@ httpServer.listen(process.env.PORT, () =>
 );
 
 app.get("/", (request, response) => {
-  response.send("Welcome to Chat API");
+  response.send("Welcome to Messenger Web Application using Socket.io");
 });
 
 app.get("/roomMessages", async (request, response) => {
