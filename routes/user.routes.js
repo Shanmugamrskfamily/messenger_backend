@@ -77,9 +77,9 @@ router.post("/signup", async (request, response) => {
   }
 });
 
-router.post("/activate", async function (request, response) {
+router.post("/activate/:activationtoken", async function (request, response) {
   try {
-    const { activationtoken } = request.headers;
+    const { activationtoken } = request.params;
     // console.log("token", activationtoken);
     const userTokened = await getUserFromActivationToken(activationtoken);
     if (userTokened) {
