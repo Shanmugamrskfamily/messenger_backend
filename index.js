@@ -21,11 +21,16 @@ console.log("mongo connected");
 
 // const io = new Server(expressServer);
 
+const corsOptions = {
+  origin: ["https://rsk-messenger-web-application.netlify.app", "https://messenger-backend-nr0d.onrender.com"],
+  methods: ["GET", "POST"],
+};
+
+
 const httpServer = http.createServer(app);
 const io = new Server(httpServer, {
-  cors: { origin: process.env.CLIENT_API, methods: ["GET", "POST"] },
+  cors: corsOptions,
 });
-
 httpServer.listen(process.env.PORT, () =>
   console.log("http server started in PORT", process.env.PORT)
 );
