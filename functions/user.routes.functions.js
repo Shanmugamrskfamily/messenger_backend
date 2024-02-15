@@ -35,14 +35,15 @@ export async function sendMail(mailerData) {
   // console.log("mailer Data", mailerData);
   // create reusable transporter object using the default SMTP transport
   let transporter = nodemailer.createTransport({
-    host: "smtp.gmail.com",
-    service: "gmail", //intead port use service gmail
+    host: "smtp-mail.outlook.com",
+    port: 587,
     secure: false, // true for 465, false for other ports
     auth: {
-      user: process.env.NODE_MAILER_MAIL, //  gmail developer email id
-      pass: process.env.NODE_MAILER_PW, // generated gmail app password
+      user: process.env.EMAIL, // generated ethereal user
+      pass: process.env.PASS, // generated ethereal password
     },
   });
+
   // send mail with defined transporter object
   //   const url = `${process.env.CLIENT_URL}/activate/${activationtoken}`;
   let info = await transporter.sendMail({
