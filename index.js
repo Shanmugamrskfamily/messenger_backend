@@ -52,7 +52,7 @@ app.get("/roomMessages", async (request, response) => {
 
 const updateOnlineStatus = async (userMail, userStatus, socketId) => {
   await client
-    .db("chatApp")
+    .db("Messenger")
     .collection("users")
     .updateOne(
       { isActivated: true, email: userMail },
@@ -62,7 +62,7 @@ const updateOnlineStatus = async (userMail, userStatus, socketId) => {
 
 const updateOfflineStatus = async (userStatus, socketId) => {
   await client
-    .db("chatApp")
+    .db("Messenger")
     .collection("users")
     .updateOne(
       { isActivated: true, socketId: socketId },
@@ -72,14 +72,14 @@ const updateOfflineStatus = async (userStatus, socketId) => {
 
 const getRoomMessages = async (room) => {
   return await client
-    .db("chatApp")
+    .db("Messenger")
     .collection("messages")
     .find({ to: room })
     .toArray();
 };
 
 const saveMessage = async (data) => {
-  await client.db("chatApp").collection("messages").insertOne(data);
+  await client.db("Messenger").collection("messages").insertOne(data);
 };
 
 io.on("connection", async (socket) => {
@@ -88,7 +88,7 @@ io.on("connection", async (socket) => {
   socket.on("new_user", async (userMail) => {
     await updateOnlineStatus(userMail, true, socket.id);
     const all = await client
-      .db("chatApp")
+      .db("Messenger")
       .collection("users")
       .find(
         { isActivated: true },
@@ -125,4 +125,4 @@ io.on("connection", async (socket) => {
   });
 });
 
-app.use("/user",auth, userRouter);
+app.use("/user", userRouter);
