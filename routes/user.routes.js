@@ -172,7 +172,7 @@ router.post('/forgot-password',async(req,res)=>{
     userId: user._id,
     type: "login",
     createdAt: Date.now(),
-    token: loginToken,
+    token: resetToken,
     isExpired: false,
   });
 
