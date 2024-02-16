@@ -8,7 +8,7 @@ import {
   getUserFromActivationToken,
   saveActivationTokenInDB,
   saveLoginTokenInDB,
-  saveResetTokenInDB,
+  updateUserPassword
 } from "../services/user.services.js";
 import {
   checkValidSignupData,
@@ -153,44 +153,84 @@ router.post("/login", async (req, res) => {
   }
 });
 
-router.get("/verifyEmail", async (req, res) => {
-  const { email } = req.headers;
-  // console.log("email", email);
-  const emailedUser = await getUserByEmail(email);
-  if (emailedUser) {
-    res.status(200).send({ message: "User Exist" });
-  } else {
-    res.status(400).send({ message: "User NOT Exist" });
+
+router.post('/forgot-password',async(req,res)=>{
+  try {
+    
+    const {email}=req.body;
+  if(!email){
+    res.status(500).send({message:'Inavlid Input!'});
+    return;
+  }
+  const user=await getUserByEmail(email);
+  if(!user){
+    res.status(400).send({message:'User Not found!'});
+    return;
+  }
+  const resetToken = await generateJWToken(user);
+  const saveResetToken = await saveLoginTokenInDB({
+    userId: user._id,
+    type: "login",
+    createdAt: Date.now(),
+    token: loginToken,
+    isExpired: false,
+  });
+
+  if(saveResetToken.insertedId){
+    const userResetInfo = { ...user, resetToken: resetToken };
+    await sendResetMail(userResetInfo).catch((err) => console.log(err));
+    res.status(200).send({
+      message: "Reset Password link has been sent to your email",
+    });
+  } 
+  else {
+  res.status(400).send({ message: "User NOT Exist" });
+}
+}
+catch (err) {
+res.status(500).send({ message: err.message });
+}
+});
+
+router.get('/reset/:resetToken',async(req,res)=>{
+  try {
+    const {resetToken}=req.params.resetToken;
+    if(!resetToken){
+      res.status(409).send({message:'Reset Token Not Found'})
+      return;
+    }
+    const user=await getUserFromActivationToken(resetToken);
+    if(!user){
+      res.status(404).send({message:'Invalid Token!'})
+      return;
+    }
+    res.status(200).send({message:'User Verified!'});
+  } catch (error) {
+    res.status(500).send({message:error.message});
   }
 });
 
-router.post("/reset", async (req, res) => {
+router.put('/reset-password/:resetToken', async (req, res) => {
   try {
-    const { email } = req.headers;
-    const emailedUser = await getUserByEmail(email);
-    if (emailedUser) {
-      const resetToken = await generateJWToken(emailedUser);
-      const tokenAddRes = await saveResetTokenInDB({
-        userId: emailedUser._id,
-        type: "reset",
-        createdAt: Date.now(),
-        token: resetToken,
-        isExpired: false,
-      });
-      // console.log("token add res", tokenAddRes);
-      if (tokenAddRes.insertedId) {
-        const userResetInfo = { ...emailedUser, resetToken: resetToken };
-        await sendResetMail(userResetInfo).catch((err) => console.log(err));
-        res.status(200).send({
-          message: "Click on Reset Password link has been sent to your email",
-        });
+    const { resetToken } = req.params;
+    const { password } = req.body;
+
+    const userTokened = await getUserFromActivationToken(resetToken);
+    if (userTokened) {
+      const updatedUser = await updateUserPassword(userTokened.userId, password);
+
+      if (updatedUser) {
+        res.status(200).send({ message: 'Password reset successful' });
+      } else {
+        res.status(500).send({ message: 'Unable to reset password' });
       }
     } else {
-      res.status(400).send({ message: "User NOT Exist" });
+      res.status(400).send({ message: 'Invalid or expired reset token' });
     }
-  } catch (err) {
-    res.status(500).send({ message: err.message });
+  } catch (error) {
+    res.status(500).send({ message: error.message });
   }
 });
+
 
 export default router;

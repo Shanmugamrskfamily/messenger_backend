@@ -76,7 +76,7 @@ export async function mailActivationLink(addedUser, activationToken) {
 
 export async function sendResetMail(userResetInfo) {
   // console.log("userResetInfo", userResetInfo);
-  const url = `${process.env.CLIENT_API}/change-password/${userResetInfo.resetToken}`;
+  const url = `${process.env.CLIENT_API}/reset-password/${userResetInfo.resetToken}`;
   const subject = "Password Reset for Messenger Web Application Account";
   const sender = {
     name: "Messenger Web Application",
