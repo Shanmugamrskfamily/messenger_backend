@@ -29,7 +29,6 @@ export async function getUserFromActivationToken(activationtoken) {
   // console.log("activ tokens is", activationtoken);
   return await client.db("Messenger").collection("userTokens").findOne({
     isExpired: false,
-    type: "activation",
     token: activationtoken,
   });
 }

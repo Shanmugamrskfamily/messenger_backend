@@ -52,7 +52,6 @@ router.post("/signup", async (request, response) => {
           const activationToken = await generateJWToken(addedUser);
           const saveTokenResult = await saveActivationTokenInDB({
             userId: addedUser._id,
-            type: "activation",
             createdAt: Date.now(),
             token: activationToken,
             isExpired: false,
@@ -170,7 +169,6 @@ router.post('/forgot-password',async(req,res)=>{
   const resetToken = await generateJWToken(user);
   const saveResetToken = await saveLoginTokenInDB({
     userId: user._id,
-    type: "login",
     createdAt: Date.now(),
     token: resetToken,
     isExpired: false,
@@ -195,17 +193,20 @@ res.status(500).send({ message: err.message });
 router.get('/reset-password/:resetToken',async(req,res)=>{
   try {
     const {resetToken}=req.params.resetToken;
+    console.log(resetToken);
     if(!resetToken){
       res.status(409).send({message:'Reset Token Not Found'})
       return;
     }
     const user=await getUserFromActivationToken(resetToken);
+    console.log(user);
     if(!user){
       res.status(404).send({message:'Invalid Token!'})
       return;
     }
     res.status(200).send({message:'User Verified!'});
   } catch (error) {
+    console.log(error);
     res.status(500).send({message:error.message});
   }
 });
