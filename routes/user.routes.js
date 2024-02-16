@@ -192,7 +192,7 @@ res.status(500).send({ message: err.message });
 }
 });
 
-router.get('/reset/:resetToken',async(req,res)=>{
+router.get('/reset-password/:resetToken',async(req,res)=>{
   try {
     const {resetToken}=req.params.resetToken;
     if(!resetToken){

@@ -84,8 +84,8 @@ export async function sendResetMail(userResetInfo) {
   };
   const receivers = [];
   receivers.push(userResetInfo.email);
-  const textContent = `Hi ${userResetInfo.name}, as you have requested to reset Password, this is the link please click and reset. ${url}`;
-  const htmlContent = `<div > <p>Hi ${userResetInfo.name} as you have requested to reset Password, this is the link please click and reset.  ${url} </p> <b>forgot? click this link to reset</b><button style="background-color:green;border-radius:10px"> <a href=${url} target="_blank"  style="font-weight:bold;color:white;text-decoration:none">Reset Password</a></button></div>`;
+  const textContent = `Hi ${userResetInfo.name}, as you have requested to reset Password, this is the link please click and reset.`;
+  const htmlContent = `<div > <p>Hi ${userResetInfo.name} as you have requested to reset Password, this is the link please click and reset. </p> <b>forgot? click this link to reset</b><button style="background-color:green;border-radius:10px"> <a href=${url} target="_blank"  style="font-weight:bold;color:white;text-decoration:none">Reset Password</a></button></div>`;
   const mailerData = { subject, sender, receivers, textContent, htmlContent };
   await sendMail(mailerData);
 }
