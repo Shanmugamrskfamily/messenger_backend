@@ -192,8 +192,10 @@ res.status(500).send({ message: err.message });
 
 router.get('/reset-password/:resetToken',async(req,res)=>{
   try {
-    const {resetToken}=req.params.resetToken;
+    const resetToken=req.params.resetToken;
+
     console.log(resetToken);
+    
     if(!resetToken){
       res.status(409).send({message:'Reset Token Not Found'})
       return;
@@ -211,7 +213,7 @@ router.get('/reset-password/:resetToken',async(req,res)=>{
   }
 });
 
-router.put('/reset-password/:resetToken', async (req, res) => {
+router.put('/change-password/:resetToken', async (req, res) => {
   try {
     const { resetToken } = req.params;
     const { password } = req.body;
