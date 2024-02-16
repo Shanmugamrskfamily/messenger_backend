@@ -53,6 +53,7 @@ router.post("/signup", async (request, response) => {
           const saveTokenResult = await saveActivationTokenInDB({
             userId: addedUser._id,
             createdAt: Date.now(),
+            type:'activation',
             token: activationToken,
             isExpired: false,
           });
@@ -170,6 +171,7 @@ router.post('/forgot-password',async(req,res)=>{
   const saveResetToken = await saveLoginTokenInDB({
     userId: user._id,
     createdAt: Date.now(),
+    type:'resetPassword',
     token: resetToken,
     isExpired: false,
   });
@@ -195,7 +197,7 @@ router.get('/reset-password/:resetToken',async(req,res)=>{
     const resetToken=req.params.resetToken;
 
     console.log(resetToken);
-    
+
     if(!resetToken){
       res.status(409).send({message:'Reset Token Not Found'})
       return;
