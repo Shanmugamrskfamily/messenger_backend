@@ -74,14 +74,17 @@ const updateOfflineStatus = async (userStatus, socketId) => {
     );
 };
 
-const getRoomMessages = async (room) => {
-
+const getRoomMessages = async (room, currentUserEmail) => {
   return await client
     .db("Messenger")
     .collection("messages")
-    .find({ to: room })
+    .find({
+      $or: [{ from: currentUserEmail }, { to: currentUserEmail }],
+      to: room,
+    })
     .toArray();
 };
+
 
 const saveMessage = async (data) => {
   await client.db("Messenger").collection("messages").insertOne(data);
@@ -104,20 +107,18 @@ io.on("connection", async (socket) => {
     socket.emit("updated_users", all);
   });
 
-  socket.on("join_room", async (room) => {
+  socket.on("join_room", async (room, currentUserEmail) => {
     socket.join(room);
-    // console.log("joined Room", room);
-    socket.emit("room_messages", await getRoomMessages(room));
+    const roomMessages = await getRoomMessages(room, currentUserEmail);
+    socket.emit("room_messages", roomMessages);
   });
 
   socket.on("message_room", async (data) => {
-    // console.log("new message to room", data);
+    // Save the message to the database
     await saveMessage(data);
-    io.to(data.to).emit(
-      "receive_room_messages",
-      await getRoomMessages(data.to)
-    );
-    // console.log("emited Data room messages", await getRoomMessages(data.to));
+    
+    // Send the message to the appropriate room
+    io.to(data.to).emit("receive_room_messages", [data]);
   });
 
   socket.on("disconnect", async function () {
