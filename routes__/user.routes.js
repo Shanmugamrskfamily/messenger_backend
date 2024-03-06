@@ -32,7 +32,6 @@ router.post("/signup", async (request, response) => {
         .status(409)
         .send({ message: "User Already Exist on this Email, try login" });
     } else {
-      if (checkValidSignupData(data)) {
         const formattedSignupData = {
           name: data.name,
           mobile: data.mobile,
@@ -67,7 +66,6 @@ router.post("/signup", async (request, response) => {
             message:
               "User Added, Please use the Activation Link mailed to you for Activation your Login",
           });
-        }
       } else {
         response.status(400).send({ message: "Invalid Signup Data" });
       }

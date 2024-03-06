@@ -3,7 +3,7 @@ import * as dotenv from "dotenv";
 dotenv.config();
 import { MongoClient } from "mongodb";
 import cors from "cors";
-import userRouter from "./routes/user.routes.js";
+import userRouter from "./routes__/user.routes.js";
 import { Server } from "socket.io";
 import http from "http";
 import { auth } from "./middlewares/auth.js";
