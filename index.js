@@ -42,8 +42,7 @@ app.get("/", (request, response) => {
 app.get("/roomMessages", async (request, response) => {
   try {
     const room = request.headers.selectedroom;
-
-    const messages = await getRoomMessages(room);
+    const messages = await getRoomMessages(room, email);
     // console.log("messsss", messages);
     response.send({
       message: "Messages Updated",
@@ -76,6 +75,7 @@ const updateOfflineStatus = async (userStatus, socketId) => {
 };
 
 const getRoomMessages = async (room) => {
+
   return await client
     .db("Messenger")
     .collection("messages")
