@@ -235,6 +235,7 @@ const sendResetPasswordEmail = async (user) => {
 export const ForgotPassword = async (req, res) => {
     try {
         const { email } = req.body;
+        console.log(email);
         const user = await User.findOne({ email });
 
         if (!user) {
