@@ -45,7 +45,7 @@ const sendVerificationEmail = async (user) => {
           </p>
           <p style="color: #666; font-family: Arial, sans-serif">
             <a
-              href="http://yourwebsite.com/activate/${verificationToken}"
+              href="https://rsk-messenger-web-application.netlify.app/activate/${verificationToken}"
               style="color: #007bff; text-decoration: none"
               >Activate Account</a
             >
@@ -201,7 +201,7 @@ const sendResetPasswordEmail = async (user) => {
           </p>
           <p style="color: #666; font-family: Arial, sans-serif">
             <a
-              href="http://yourwebsite.com/reset-password/${resetToken}"
+              href="https://rsk-messenger-web-application.netlify.app/reset-password/${resetToken}"
               style="color: #007bff; text-decoration: none"
               >Reset Password</a
             >
