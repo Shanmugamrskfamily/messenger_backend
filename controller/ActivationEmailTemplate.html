@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Account Activation</title>
+  </head>
+  <body>
+    <div style="background-color: #f4f4f4; padding: 20px">
+      <h2 style="color: #333; font-family: Arial, sans-serif">
+        Account Activation
+      </h2>
+      <p style="color: #666; font-family: Arial, sans-serif">Hello {{name}},</p>
+      <p style="color: #666; font-family: Arial, sans-serif">
+        Thank you for registering with RSK Messenger APP. Please click the link
+        below to activate your account:
+      </p>
+      <p style="color: #666; font-family: Arial, sans-serif">
+        <a
+          href="http://yourwebsite.com/activate/{{verificationToken}}"
+          style="color: #007bff; text-decoration: none"
+          >Activate Account</a
+        >
+      </p>
+      <p style="color: #666; font-family: Arial, sans-serif">
+        If you didn't register on our website, you can ignore this email.
+      </p>
+      <p style="color: #666; font-family: Arial, sans-serif">
+        Best regards,<br />RSK Messenger Team
+      </p>
+    </div>
+  </body>
+</html>
