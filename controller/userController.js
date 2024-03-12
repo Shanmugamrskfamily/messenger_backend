@@ -4,19 +4,19 @@ import { User } from '../model/userModel.js';
 import crypto from 'crypto';
 import jwt from 'jsonwebtoken';
 import nodemailer from 'nodemailer';
+require('dotenv').config();
 
 
 // Function to send verification email
 const sendVerificationEmail = async (user) => {
     // Create reusable transporter object using SMTP transport
-    let transporter = nodemailer.createTransport({
-        // Your email configuration
+    const transporter = nodemailer.createTransport({
         service: 'outlook',
         auth: {
-            user: process.env.EMAIL,
-            pass: process.env.PASS
-        }
-    });
+          user: process.env.EMAIL,
+          pass: process.env.PASS,
+        },
+      });
 
     // Generate verification token
     const verificationToken = crypto.randomBytes(20).toString('hex');
@@ -164,14 +164,14 @@ export const Login = async (req, res) => {
 // Function to send reset password email
 const sendResetPasswordEmail = async (user) => {
     // Create reusable transporter object using SMTP transport
-    let transporter = nodemailer.createTransport({
-        // Your email configuration
+    const transporter = nodemailer.createTransport({
         service: 'outlook',
         auth: {
-            user: process.env.EMAIL,
-            pass: process.env.PASS
-        }
-    });
+          user: process.env.EMAIL,
+          pass: process.env.PASS,
+        },
+      });
+
 
     // Generate reset token
     const resetToken = crypto.randomBytes(20).toString('hex');
