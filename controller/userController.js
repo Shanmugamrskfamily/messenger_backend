@@ -4,7 +4,9 @@ import { User } from '../model/userModel.js';
 import crypto from 'crypto';
 import jwt from 'jsonwebtoken';
 import nodemailer from 'nodemailer';
-require('dotenv').config();
+import dotenv from 'dotenv'
+dotenv.config();
+
 
 
 // Function to send verification email
